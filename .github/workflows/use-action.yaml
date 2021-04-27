@@ -1,0 +1,35 @@
+name: Use Action
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  use-action:
+    name: Use Action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/checkout@v2
+
+      # Minimal publish
+      - uses: imjasonh/setup-ko@main
+      - run: ko publish --bare ./
+
+      # Install an old release.
+      - uses: imjasonh/setup-ko@main
+        with:
+          version: v0.8.0
+      - name: Check installed version
+        run: ko version | grep 0.8.0
+
+      # Install from tip
+      - uses: imjasonh/setup-ko@main
+        with:
+          version: tip
+      - name: Check installed version (tip)
+        run: |
+          sudo rm /usr/local/bin/ko # Uninstall previous versions.
+          ko version
