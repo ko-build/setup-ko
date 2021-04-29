@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: imjasonh/setup-ko@v0.1
-      - run: ko resolve config/ > release-${{ github.sha }}.yaml
+      - run: ko resolve -f config/ > release-${{ github.sha }}.yaml
 
       - name: Create Release
         id: create_release
