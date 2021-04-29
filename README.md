@@ -69,7 +69,7 @@ Doing so means I can push changes to the action that will immediately start runn
 To guard against this, you can reference a specific version of the action definition, for example:
 
 ```
-- uses: imjasonh/setup-ko@v0.0.4
+- uses: imjasonh/setup-ko@v0.1
 ```
 
 Regardless what version of the action you reference, it will _still install the latest version of `ko`_ unless you specify `version:`.
