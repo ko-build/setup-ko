@@ -21,7 +21,7 @@ jobs:
           go-version: 1.15
       - uses: actions/checkout@v2
 
-      - uses: imjasonh/setup-ko@main
+      - uses: imjasonh/setup-ko@v0.1
       - run: ko publish ./
 ```
 
@@ -37,7 +37,7 @@ By default, `imjasonh/setup-ko` installs the latest released version of `ko`.
 You can select a version with the `version` parameter:
 
 ```yaml
-- uses: imjasonh/setup-ko@main
+- uses: imjasonh/setup-ko@v0.1
   with:
     version: v0.8.0
 ```
@@ -52,7 +52,7 @@ To do this, you need to provide credentials to authorize the push.
 You can use [encrypted secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) to store the authorization token, and pass it to `ko login` before pushing:
 
 ```
-- uses: imjasonh/setup-ko@main
+- uses: imjasonh/setup-ko@v0.1
 - env:
     auth_token: ${{ secrets.auth_token }}
   run: |
@@ -61,16 +61,55 @@ You can use [encrypted secrets](https://docs.github.com/en/actions/reference/enc
     ko publish ./
 ```
 
+### Release Integration
+
+In addition to publishing images, `ko` can produce YAML files containing references to built images, using [`ko resolve`](https://github.com/google/ko#kubernetes-integration)
+
+With this action, you can use `ko resolve` to produce output YAML that you then attach to a GitHub Release using [actions/create-release](https://github.com/actions/create-release) and [actions/upload-release-asset](https://github.com/actions/upload-release-asset).
+For example:
+
+```yaml
+name: Publish Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish-release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/checkout@v2
+
+      - uses: imjasonh/setup-ko@v0.1
+      - run: ko resolve config/ > release-${{ github.sha }}.yaml
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release-${{ github.sha }}.yaml
+          asset_name: release-${{ github.sha }}.yaml
+          asset_content_type: application/x-yaml
+```
+
 ### A note on versioning
 
-In general it's probably a bad idea to reference the version of the action definition from `main`.
-Doing so means I can push changes to the action that will immediately start running as part of your CI workflows. 😱
+The `@v0.1` in the `uses` statement refers to the version _of the action definition in this repo._
 
-To guard against this, you can reference a specific version of the action definition, for example:
-
-```
-- uses: imjasonh/setup-ko@v0.1
-```
-
-Regardless what version of the action you reference, it will _still install the latest version of `ko`_ unless you specify `version:`.
-
+Regardless of what version of the action definition you use, `imjasonh/setup-ko` will install the latest released version of `ko` unless otherwise specified with `version:`.
