@@ -23,7 +23,7 @@ runs:
         go get github.com/google/ko@main
         ;;
       latest-release)
-        tag=$(curl -s https://api.github.com/repos/google/ko/releases | jq -r '.[].tag_name' | head -n 1)
+        tag=$(curl -s https://api.github.com/repos/google/ko/releases/latest | jq -r '.tag_name')
         ;;
       *)
         tag="${{ inputs.version }}"
