@@ -29,9 +29,14 @@ runs:
         tag="${{ inputs.version }}"
       esac
 
+      os=${{ runner.os }}
+      if [[ $os == "macOS" ]]; then
+        os="Darwin"
+      fi
+
       if [[ ! -z ${tag} ]]; then
-        echo "Installing ko @ ${tag}"
-        curl -fsL https://github.com/google/ko/releases/download/${tag}/ko_${tag:1}_Linux_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin ko
+        echo "Installing ko @ ${tag} for ${os}"
+        curl -fsL https://github.com/google/ko/releases/download/${tag}/ko_${tag:1}_${os}_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin ko
       fi
 
       # NB: username doesn't seem to matter.
