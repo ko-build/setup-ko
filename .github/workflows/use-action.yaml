@@ -7,7 +7,11 @@ on:
 jobs:
   use-action:
     name: Use Action
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+
     steps:
       - uses: actions/setup-go@v2
         with:
@@ -15,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
 
       # Minimal publish
-      - uses: imjasonh/setup-ko@v0.1
+      - uses: imjasonh/setup-ko@main
       - run: ko publish --bare ./
 
       # Install an old release.
