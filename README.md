@@ -30,6 +30,8 @@ _That's it!_ This workflow will build and publish your code to [GitHub Container
 By default, the action sets `KO_DOCKER_REPO=ghcr.io/[owner]/[repo]`.
 See [documentation for `ko`](https://github.com/google/ko#configuration) to learn more about configuring `ko`.
 
+The action works on Linux and macOS [runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners), and _should_ work for Windows runners when `ko` releases include Windows binaries (next `ko` release🤞! see [google/ko#339](https://github.com/google/ko/pull/339))
+
 ### Select `ko` version to install
 
 By default, `imjasonh/setup-ko` installs the latest released version of `ko`.
