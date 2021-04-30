@@ -67,47 +67,34 @@ You can use [encrypted secrets](https://docs.github.com/en/actions/reference/enc
 
 In addition to publishing images, `ko` can produce YAML files containing references to built images, using [`ko resolve`](https://github.com/google/ko#kubernetes-integration)
 
-With this action, you can use `ko resolve` to produce output YAML that you then attach to a GitHub Release using [actions/create-release](https://github.com/actions/create-release) and [actions/upload-release-asset](https://github.com/actions/upload-release-asset).
+With this action, you can use `ko resolve` to produce output YAML that you then attach to a GitHub Release using the [GitHub CLI](https://cli.github.com).
 For example:
 
 ```yaml
-name: Publish Release
+name: Publish Release YAML
 
 on:
-  push:
-    tags: ['v*']
+  release:
+    types: ['created']
 
 jobs:
-  publish-release:
-    name: Publish Release
+  publish-release-yaml:
+    name: Publish Release YAML
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.15
       - uses: actions/checkout@v2
-
       - uses: imjasonh/setup-ko@v0.3
-      - run: ko resolve -f config/ > release-${{ github.sha }}.yaml
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Generate and upload release.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./release-${{ github.sha }}.yaml
-          asset_name: release-${{ github.sha }}.yaml
-          asset_content_type: application/x-yaml
+        run: |
+          tag=$(echo ${{ github.ref }} | cut -c11-)  # get tag name without tags/refs/ prefix.
+          ko resolve -t ${tag} -f config/ > release.yaml
+          gh release upload ${tag} release.yaml
 ```
 
 ### A note on versioning
