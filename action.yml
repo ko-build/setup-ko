@@ -41,9 +41,15 @@ runs:
         curl -fsL https://github.com/google/ko/releases/download/${tag}/ko_${tag:1}_${os}_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin ko
       fi
 
-      # NB: username doesn't seem to matter.
-      echo "${{ github.token }}" | ko login ghcr.io --username "dummy" --password-stdin
+      if [[ ! -z ${KO_DOCKER_REPO} ]]; then
+        echo "KO_DOCKER_REPO is already set"
+        echo "Skipping login to ghcr.io and passing KO_DOCKER_REPO=${KO_DOCKER_REPO} on to future steps"
+        echo "KO_DOCKER_REPO=${KO_DOCKER_REPO}" >> $GITHUB_ENV
+      else
+        # NB: username doesn't seem to matter.
+        echo "${{ github.token }}" | ko login ghcr.io --username "dummy" --password-stdin
 
-      # Set KO_DOCKER_REPO for future steps.
-      echo "KO_DOCKER_REPO=ghcr.io/${{ github.repository }}"
-      echo "KO_DOCKER_REPO=ghcr.io/${{ github.repository }}" >> $GITHUB_ENV
+        # Set KO_DOCKER_REPO for future steps.
+        echo "KO_DOCKER_REPO=ghcr.io/${{ github.repository }}"
+        echo "KO_DOCKER_REPO=ghcr.io/${{ github.repository }}" >> $GITHUB_ENV
+      fi
