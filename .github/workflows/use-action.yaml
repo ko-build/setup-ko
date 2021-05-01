@@ -45,7 +45,7 @@ jobs:
           KO_DOCKER_REPO: already-set
       - name: Check pre-set KO_DOCKER_REPO
         run: |
-          if [[ "${KO_DOCKER_REPO}" != "already-set"]]; then
+          if [[ "${KO_DOCKER_REPO}" != "already-set" ]]; then
             echo "${KO_DOCKER_REPO} != already-set"
             exit 1
           fi
