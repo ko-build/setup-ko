@@ -21,7 +21,7 @@ jobs:
           go-version: 1.15
       - uses: actions/checkout@v2
 
-      - uses: imjasonh/setup-ko@v0.3
+      - uses: imjasonh/setup-ko@v0.4
       - run: ko publish ./
 ```
 
@@ -42,7 +42,7 @@ By default, `imjasonh/setup-ko` installs the latest released version of `ko`.
 You can select a version with the `version` parameter:
 
 ```yaml
-- uses: imjasonh/setup-ko@v0.3
+- uses: imjasonh/setup-ko@v0.4
   with:
     version: v0.8.0
 ```
@@ -57,7 +57,7 @@ To do this, you need to provide credentials to authorize the push.
 You can use [encrypted secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) to store the authorization token, and pass it to `ko login` before pushing:
 
 ```
-- uses: imjasonh/setup-ko@v0.3
+- uses: imjasonh/setup-ko@v0.4
 - env:
     auth_token: ${{ secrets.auth_token }}
   run: |
@@ -89,7 +89,7 @@ jobs:
         with:
           go-version: 1.15
       - uses: actions/checkout@v2
-      - uses: imjasonh/setup-ko@v0.3
+      - uses: imjasonh/setup-ko@v0.4
 
       - name: Generate and upload release.yaml
         env:
@@ -102,6 +102,6 @@ jobs:
 
 ### A note on versioning
 
-The `@v0.3` in the `uses` statement refers to the version _of the action definition in this repo._
+The `@v0.4` in the `uses` statement refers to the version _of the action definition in this repo._
 
 Regardless of what version of the action definition you use, `imjasonh/setup-ko` will install the latest released version of `ko` unless otherwise specified with `version:`.
