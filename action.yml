@@ -21,7 +21,7 @@ runs:
       # - otherwise, install the specified version.
       case ${{ inputs.version }} in
       tip)
-        echo "Installing ko using go get"
+        echo "Installing ko using go install"
         go install github.com/google/ko@main
         ;;
       latest-release)
