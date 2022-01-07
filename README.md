@@ -45,7 +45,7 @@ You can select a version with the `version` parameter:
     version: v0.8.0
 ```
 
-To build and install `ko` from source using `go get`, specify `version: tip`.
+To build and install `ko` from source using `go install`, specify `version: tip`.
 
 ### Pushing to other registries
 
