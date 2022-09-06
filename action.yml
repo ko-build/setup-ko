@@ -25,7 +25,7 @@ runs:
         go install github.com/google/ko@main
         ;;
       latest-release)
-        tag=$(curl -s -u "username:${{ github.token }}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
+        tag=$(curl -L -s -u "username:${{ github.token }}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
         ;;
       *)
         tag="${{ inputs.version }}"
