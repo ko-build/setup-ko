@@ -2,6 +2,10 @@
 
 [![Build](https://github.com/imjasonh/setup-ko/actions/workflows/use-action.yaml/badge.svg)](https://github.com/imjasonh/setup-ko/actions/workflows/use-action.yaml)
 
+> :warning: Note: `ko` recently [moved to its own GitHub org](https://github.com/ko-build/ko/issues/791), which broke `setup-ko@v0.5` if the `ko` version wasn't specified.
+> 
+> To fix this, either upgrade to [`setup-ko@v0.6`](https://github.com/imjasonh/setup-ko/releases/tag/v0.6) or specify `version`
+
 ## Example usage
 
 ```yaml
