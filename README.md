@@ -22,11 +22,11 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.15
+          go-version: 1.18
       - uses: actions/checkout@v2
 
-      - uses: imjasonh/setup-ko@v0.4
-      - run: ko publish ./
+      - uses: imjasonh/setup-ko@v0.6
+      - run: ko build
 ```
 
 _That's it!_ This workflow will build and publish your code to [GitHub Container Regsitry](https://ghcr.io).
@@ -44,9 +44,9 @@ By default, `imjasonh/setup-ko` installs the [latest released version of `ko`](h
 You can select a version with the `version` parameter:
 
 ```yaml
-- uses: imjasonh/setup-ko@v0.4
+- uses: imjasonh/setup-ko@v0.6
   with:
-    version: v0.8.0
+    version: v0.11.2
 ```
 
 To build and install `ko` from source using `go install`, specify `version: tip`.
@@ -64,14 +64,14 @@ You can use [encrypted secrets](https://docs.github.com/en/actions/reference/enc
 
 steps:
 ...
-- uses: imjasonh/setup-ko@v0.4
+- uses: imjasonh/setup-ko@v0.6
   env:
     KO_DOCKER_REPO: my.registry/my-repo
 - env:
     auth_token: ${{ secrets.auth_token }}
   run: |
     echo "${auth_token}" | ko login https://my.registry --username my-username --password-stdin
-    ko publish ./
+    ko build
 ```
 
 ### Release Integration
@@ -97,7 +97,7 @@ jobs:
         with:
           go-version: 1.15
       - uses: actions/checkout@v2
-      - uses: imjasonh/setup-ko@v0.4
+      - uses: imjasonh/setup-ko@v0.6
 
       - name: Generate and upload release.yaml
         env:
