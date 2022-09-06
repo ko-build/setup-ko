@@ -25,7 +25,7 @@ runs:
         go install github.com/google/ko@main
         ;;
       latest-release)
-        tag=$(curl -s -u "username:${{ github.token }}" https://api.github.com/repos/google/ko/releases/latest | jq -r '.tag_name')
+        tag=$(curl -L -s -u "username:${{ github.token }}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
         ;;
       *)
         tag="${{ inputs.version }}"
@@ -38,7 +38,7 @@ runs:
 
       if [[ ! -z ${tag} ]]; then
         echo "Installing ko @ ${tag} for ${os}"
-        curl -fsL https://github.com/google/ko/releases/download/${tag}/ko_${tag:1}_${os}_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin ko
+        curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin ko
       fi
 
       if [[ ! -z ${KO_DOCKER_REPO} ]]; then
