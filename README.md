@@ -60,8 +60,7 @@ If `KO_DOCKER_REPO` is already set when `setup-ko` runs, it will skip logging in
 To do this, you should provide credentials to authorize the push.
 You can use [encrypted secrets](https://docs.github.com/en/actions/reference/encrypted-secrets) to store the authorization token, and pass it to `ko login` before pushing:
 
-```
-
+```yaml
 steps:
 ...
 - uses: imjasonh/setup-ko@v0.6
