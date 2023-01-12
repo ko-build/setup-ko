@@ -1,10 +1,10 @@
 # GitHub Action to install and setup [`ko`](https://github.com/google/ko)
 
-[![Build](https://github.com/imjasonh/setup-ko/actions/workflows/use-action.yaml/badge.svg)](https://github.com/imjasonh/setup-ko/actions/workflows/use-action.yaml)
+[![Build](https://github.com/ko-build/setup-ko/actions/workflows/use-action.yaml/badge.svg)](https://github.com/ko-build/setup-ko/actions/workflows/use-action.yaml)
 
 > :warning: Note: `ko` recently [moved to its own GitHub org](https://github.com/ko-build/ko/issues/791), which broke `setup-ko@v0.5` if the `ko` version wasn't specified.
 > 
-> To fix this, either upgrade to [`setup-ko@v0.6`](https://github.com/imjasonh/setup-ko/releases/tag/v0.6) or specify `version`
+> To fix this, either upgrade to [`setup-ko@v0.6`](https://github.com/ko-build/setup-ko/releases/tag/v0.6) or specify `version`
 
 ## Example usage
 
@@ -25,7 +25,7 @@ jobs:
           go-version: 1.18
       - uses: actions/checkout@v2
 
-      - uses: imjasonh/setup-ko@v0.6
+      - uses: ko-build/setup-ko@v0.6
       - run: ko build
 ```
 
@@ -35,16 +35,17 @@ By default, the action sets `KO_DOCKER_REPO=ghcr.io/[owner]/[repo]` for all subs
 
 See [documentation for `ko`](https://github.com/google/ko#configuration) to learn more about configuring `ko`.
 
-The action works on Linux and macOS [runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners). If you'd like support for Windows runners, [let me know](https://github.com/imjasonh/setup-ko/issues/new).
+The action works on Linux and macOS [runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners).
+If you'd like support for Windows runners, [let us know](https://github.com/ko-build/setup-ko/issues/new)!
 
 ### Select `ko` version to install
 
-By default, `imjasonh/setup-ko` installs the [latest released version of `ko`](https://github.com/google/ko/releases).
+By default, `ko-build/setup-ko` installs the [latest released version of `ko`](https://github.com/google/ko/releases).
 
 You can select a version with the `version` parameter:
 
 ```yaml
-- uses: imjasonh/setup-ko@v0.6
+- uses: ko-build/setup-ko@v0.6
   with:
     version: v0.11.2
 ```
@@ -53,7 +54,7 @@ To build and install `ko` from source using `go install`, specify `version: tip`
 
 ### Pushing to other registries
 
-By default, `imjasonh/setup-ko` configures `ko` to push images to [GitHub Container Registry](https://ghcr.io), but you can configure it to push to other registries as well.
+By default, `ko-build/setup-ko` configures `ko` to push images to [GitHub Container Registry](https://ghcr.io), but you can configure it to push to other registries as well.
 
 If `KO_DOCKER_REPO` is already set when `setup-ko` runs, it will skip logging in to ghcr.io and will propagate `KO_DOCKER_REPO` for subsequent steps.
 
@@ -63,7 +64,7 @@ You can use [encrypted secrets](https://docs.github.com/en/actions/reference/enc
 ```yaml
 steps:
 ...
-- uses: imjasonh/setup-ko@v0.6
+- uses: ko-build/setup-ko@v0.6
   env:
     KO_DOCKER_REPO: my.registry/my-repo
 - env:
@@ -96,7 +97,7 @@ jobs:
         with:
           go-version: 1.15
       - uses: actions/checkout@v2
-      - uses: imjasonh/setup-ko@v0.6
+      - uses: ko-build/setup-ko@v0.6
 
       - name: Generate and upload release.yaml
         env:
@@ -109,6 +110,6 @@ jobs:
 
 ### A note on versioning
 
-The `@v0.4` in the `uses` statement refers to the version _of the action definition in this repo._
+The `@v0.X` in the `uses` statement refers to the version _of the action definition in this repo._
 
-Regardless of what version of the action definition you use, `imjasonh/setup-ko` will install the latest released version of `ko` unless otherwise specified with `version:`.
+Regardless of what version of the action definition you use, `ko-build/setup-ko` will install the latest released version of `ko` unless otherwise specified with `version:`.

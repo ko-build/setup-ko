@@ -1,3 +1,3 @@
-module github.com/imjasonh/setup-ko
+module github.com/ko-build/setup-ko
 
 go 1.16

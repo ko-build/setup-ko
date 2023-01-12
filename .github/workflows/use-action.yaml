@@ -19,18 +19,18 @@ jobs:
       - uses: actions/checkout@v2
 
       # Minimal publish
-      - uses: imjasonh/setup-ko@main
+      - uses: ko-build/setup-ko@main
       - run: ko publish --bare ./
 
       - name: Install old release
-        uses: imjasonh/setup-ko@main
+        uses: ko-build/setup-ko@main
         with:
           version: v0.8.0
       - name: Check installed version
         run: ko version | grep 0.8.0
 
       - name: Install from tip
-        uses: imjasonh/setup-ko@main
+        uses: ko-build/setup-ko@main
         with:
           version: tip
       - name: Check installed version (tip)
@@ -40,7 +40,7 @@ jobs:
 
       # If KO_DOCKER_REPO is set during setup, it's set for future steps.
       - name: Pre-set KO_DOCKER_REPO
-        uses: imjasonh/setup-ko@main
+        uses: ko-build/setup-ko@main
         env:
           KO_DOCKER_REPO: already-set
       - name: Check pre-set KO_DOCKER_REPO
