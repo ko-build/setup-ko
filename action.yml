@@ -22,7 +22,7 @@ runs:
       case ${{ inputs.version }} in
       tip)
         echo "Installing ko using go install"
-        go install github.com/ko-build/ko@main
+        go install github.com/google/ko@main
         ;;
       latest-release)
         tag=$(curl -L -s -u "username:${{ github.token }}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
