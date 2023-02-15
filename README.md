@@ -1,4 +1,4 @@
-# GitHub Action to install and setup [`ko`](https://github.com/google/ko)
+# GitHub Action to install and setup [`ko`](https://github.com/ko-build/ko)
 
 [![Build](https://github.com/ko-build/setup-ko/actions/workflows/use-action.yaml/badge.svg)](https://github.com/ko-build/setup-ko/actions/workflows/use-action.yaml)
 
@@ -33,14 +33,14 @@ _That's it!_ This workflow will build and publish your code to [GitHub Container
 
 By default, the action sets `KO_DOCKER_REPO=ghcr.io/[owner]/[repo]` for all subsequent steps, and uses the `${{ github.token }}` to authorize pushes to GHCR.
 
-See [documentation for `ko`](https://github.com/google/ko#configuration) to learn more about configuring `ko`.
+See [documentation for `ko`](https://ko.build/configuration/) to learn more about configuring `ko`.
 
 The action works on Linux and macOS [runners](https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners).
 If you'd like support for Windows runners, [let us know](https://github.com/ko-build/setup-ko/issues/new)!
 
 ### Select `ko` version to install
 
-By default, `ko-build/setup-ko` installs the [latest released version of `ko`](https://github.com/google/ko/releases).
+By default, `ko-build/setup-ko` installs the [latest released version of `ko`](https://github.com/ko-build/ko/releases).
 
 You can select a version with the `version` parameter:
 
@@ -76,7 +76,7 @@ steps:
 
 ### Release Integration
 
-In addition to publishing images, `ko` can produce YAML files containing references to built images, using [`ko resolve`](https://github.com/google/ko#kubernetes-integration)
+In addition to publishing images, `ko` can produce YAML files containing references to built images, using [`ko resolve`](https://ko.build/features/k8s)
 
 With this action, you can use `ko resolve` to produce output YAML that you then attach to a GitHub Release using the [GitHub CLI](https://cli.github.com).
 For example:
