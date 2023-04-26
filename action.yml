@@ -51,7 +51,7 @@ runs:
 
         # Set KO_DOCKER_REPO for future steps.
         # We need to get the repository name in lowercase, otherwise it could fail
-        repo=$(echo "{{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         echo "KO_DOCKER_REPO=ghcr.io/${repo}"
         echo "KO_DOCKER_REPO=ghcr.io/${repo}" >> $GITHUB_ENV
       fi
