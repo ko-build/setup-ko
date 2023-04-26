@@ -50,6 +50,8 @@ runs:
         echo "${{ github.token }}" | ko login ghcr.io --username "dummy" --password-stdin
 
         # Set KO_DOCKER_REPO for future steps.
-        echo "KO_DOCKER_REPO=ghcr.io/${{ github.repository }}"
-        echo "KO_DOCKER_REPO=ghcr.io/${{ github.repository }}" >> $GITHUB_ENV
+        # We need to get the repository name in lowercase, otherwise it could fail
+        repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        echo "KO_DOCKER_REPO=ghcr.io/${repo}"
+        echo "KO_DOCKER_REPO=ghcr.io/${repo}" >> $GITHUB_ENV
       fi
