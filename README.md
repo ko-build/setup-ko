@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.20
+          go-version: '1.20.x'
       - uses: actions/checkout@v2
 
       - uses: ko-build/setup-ko@v0.6
@@ -95,7 +95,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v2
         with:
-          go-version: 1.20
+          go-version: '1.20.x'
       - uses: actions/checkout@v2
       - uses: ko-build/setup-ko@v0.6
 
