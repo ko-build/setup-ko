@@ -5,7 +5,7 @@ branding:
   color: green
 inputs:
   version:
-    description: 'Version of ko to install (tip, latest-release, v0.8.2, etc.)'
+    description: 'Version of ko to install (tip, latest-release, v0.14.1, etc.)'
     required: true
     default: 'latest-release'
 runs:
