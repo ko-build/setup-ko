@@ -1,3 +1,3 @@
 module github.com/ko-build/setup-ko
 
-go 1.20
+go 1.22
