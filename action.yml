@@ -40,7 +40,7 @@ runs:
         arch="x86_64"
       fi
       if [[ ! -z ${tag} ]]; then
-        echo "Installing ko @ ${tag} for ${os}"
+        echo "Installing ko @ ${tag} for ${os} ${arch}"
         curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz | sudo tar xzf - -C /usr/local/bin ko
       fi
 
