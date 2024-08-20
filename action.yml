@@ -36,7 +36,7 @@ runs:
       if [[ $os == "macOS" ]]; then
         os="Darwin"
       fi
-      if [[ $arch == "x86" ]]; then
+      if [[ $arch == "x64" ]]; then
         arch="x86_64"
       fi
       if [[ ! -z ${tag} ]]; then
