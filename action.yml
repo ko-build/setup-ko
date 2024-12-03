@@ -32,13 +32,16 @@ runs:
       esac
 
       os=${{ runner.os }}
+      arch=$(echo "${{ runner.arch }}" | tr '[:upper:]' '[:lower:]')
       if [[ $os == "macOS" ]]; then
         os="Darwin"
       fi
-
+      if [[ $arch == "x64" ]]; then
+        arch="x86_64"
+      fi
       if [[ ! -z ${tag} ]]; then
-        echo "Installing ko @ ${tag} for ${os}"
-        curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_x86_64.tar.gz | sudo tar xzf - -C /usr/local/bin ko
+        echo "Installing ko @ ${tag} for ${os} ${arch}"
+        curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz | sudo tar xzf - -C /usr/local/bin ko
       fi
 
       if [[ ! -z ${KO_DOCKER_REPO} ]]; then
