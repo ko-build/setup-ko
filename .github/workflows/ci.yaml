@@ -5,7 +5,13 @@ on:
 
 jobs:
   test-ko-action:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-latest
+          - macos-latest
+          - github-arm64-2c-8gb
+    runs-on: ${{matrix.runner}}
 
     steps:
       - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
