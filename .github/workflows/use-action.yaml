@@ -13,6 +13,7 @@ jobs:
       matrix:
         platform:
           - ubuntu-latest
+          - ubuntu-latest-arm
           - macos-latest
 
     runs-on: ${{ matrix.platform }}
