@@ -3,7 +3,7 @@
 [![Build](https://github.com/ko-build/setup-ko/actions/workflows/use-action.yaml/badge.svg)](https://github.com/ko-build/setup-ko/actions/workflows/use-action.yaml)
 
 > :warning: Note: `ko` recently [moved to its own GitHub org](https://github.com/ko-build/ko/issues/791), which broke `setup-ko@v0.5` if the `ko` version wasn't specified.
-> 
+>
 > To fix this, either upgrade to [`setup-ko@v0.6`](https://github.com/ko-build/setup-ko/releases/tag/v0.6) or specify `version`
 
 ## Example usage
@@ -20,10 +20,10 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.18
-      - uses: actions/checkout@v2
+          go-version: '1.20.x'
+      - uses: actions/checkout@v3
 
       - uses: ko-build/setup-ko@v0.6
       - run: ko build
@@ -47,7 +47,7 @@ You can select a version with the `version` parameter:
 ```yaml
 - uses: ko-build/setup-ko@v0.6
   with:
-    version: v0.11.2
+    version: v0.14.1
 ```
 
 To build and install `ko` from source using `go install`, specify `version: tip`.
@@ -86,17 +86,18 @@ name: Publish Release YAML
 
 on:
   release:
-    types: ['created']
+    types:
+      - 'created'
 
 jobs:
   publish-release-yaml:
     name: Publish Release YAML
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v4
         with:
-          go-version: 1.15
-      - uses: actions/checkout@v2
+          go-version: '1.20'
+      - uses: actions/checkout@v3
       - uses: ko-build/setup-ko@v0.6
 
       - name: Generate and upload release.yaml

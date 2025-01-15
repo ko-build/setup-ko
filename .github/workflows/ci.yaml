@@ -1,22 +1,17 @@
-name: Use Action
+name: ci
 
 on:
-  push:
-    branches:
-      - 'main'
+  pull_request:
 
 jobs:
-  use-action:
-    name: Use Action
-
+  test-ko-action:
     strategy:
       matrix:
-        platform:
+        runner:
           - ubuntu-latest
           - ubuntu-latest-arm
-          - macos-latest
-
-    runs-on: ${{ matrix.platform }}
+          
+    runs-on: ${{matrix.runner}}
 
     steps:
       - uses: actions/setup-go@3041bf56c941b39c61721a86cd11f3bb1338122a # v5.2.0
@@ -27,20 +22,23 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # Minimal publish
-      - uses: ko-build/setup-ko@main
+      - uses: ./
 
       - run: ko publish --bare ./
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          KO_DOCKER_REPO: ko.local
 
-      - name: Install specific release
-        uses: ko-build/setup-ko@main
+      - name: Install old release
+        uses: ./
         with:
-          version: v0.16.0
+          version: v0.8.0
 
       - name: Check installed version
-        run: ko version | grep 0.16.0
+        run: ko version | grep 0.8.0
 
       - name: Install from tip
-        uses: ko-build/setup-ko@main
+        uses: ./
         with:
           version: tip
 
@@ -51,7 +49,7 @@ jobs:
 
       # If KO_DOCKER_REPO is set during setup, it's set for future steps.
       - name: Pre-set KO_DOCKER_REPO
-        uses: ko-build/setup-ko@main
+        uses: ./
         env:
           KO_DOCKER_REPO: already-set
 
