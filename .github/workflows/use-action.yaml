@@ -34,10 +34,10 @@ jobs:
       - name: Install specific release
         uses: ko-build/setup-ko@main
         with:
-          version: v0.17.0
+          version: v0.16.0
 
       - name: Check installed version
-        run: ko version | grep 0.17.0
+        run: ko version | grep 0.16.0
 
       - name: Install from tip
         uses: ko-build/setup-ko@main
