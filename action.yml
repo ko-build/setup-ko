@@ -8,12 +8,21 @@ inputs:
     description: 'Version of ko to install (tip, latest-release, v0.14.1, etc.)'
     required: true
     default: 'latest-release'
+  use-sudo:
+    description: 'set to true if install-dir location requires sudo privs'
+    required: false
+    default: 'false'
 runs:
   using: "composite"
   steps:
   - shell: bash
     run: |
       set -ex
+
+      SUDO=
+      if [[ "${{ inputs.use-sudo }}" == "true" ]] && command -v sudo >/dev/null; then
+        SUDO=sudo
+      fi
 
       # Install ko:
       # - if version is "tip", install from tip of main.
@@ -41,7 +50,7 @@ runs:
       fi
       if [[ ! -z ${tag} ]]; then
         echo "Installing ko @ ${tag} for ${os} ${arch}"
-        curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz | tar xzf - -C /usr/local/bin ko
+        curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz | $SUDO tar xzf - -C /usr/local/bin ko
       fi
 
       if [[ ! -z ${KO_DOCKER_REPO} ]]; then
