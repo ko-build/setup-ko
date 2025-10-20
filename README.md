@@ -40,6 +40,8 @@ If you'd like support for Windows runners, [let us know](https://github.com/ko-b
 
 ### Select `ko` version to install
 
+#### `version` input
+
 By default, `ko-build/setup-ko` installs the [latest released version of `ko`](https://github.com/ko-build/ko/releases).
 
 You can select a version with the `version` parameter:
@@ -51,6 +53,18 @@ You can select a version with the `version` parameter:
 ```
 
 To build and install `ko` from source using `go install`, specify `version: tip`.
+
+#### `ko-version-file` input
+
+If the `ko-version-file` input is specified, the action will extract the version from the file and install it.
+
+If both `version` and `ko-version-file` inputs are provided, the `version` input will be used.
+
+```yaml
+- uses: ko-build/setup-ko@v0.10
+  with:
+    ko-version-file: '.ko-version'
+```
 
 ### Pushing to other registries
 
