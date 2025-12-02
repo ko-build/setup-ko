@@ -6,8 +6,12 @@ branding:
 inputs:
   version:
     description: 'Version of ko to install (tip, latest-release, v0.14.1, etc.)'
-    required: true
+    required: false
     default: 'latest-release'
+  ko-version-file:
+    description: 'Path to a file containing the Go version to install (if different from default)'
+    required: false
+    default: ''
   use-sudo:
     description: 'set to true if install-dir location requires sudo privs'
     required: false
@@ -16,19 +20,33 @@ runs:
   using: "composite"
   steps:
   - shell: bash
+    env:
+      KO_VERSION_FILE: ${{ inputs.ko-version-file }}
+      KO_VERSION: ${{ inputs.version }}
+      USE_SUDO: ${{ inputs.use-sudo }}
     run: |
       set -ex
 
       SUDO=
-      if [[ "${{ inputs.use-sudo }}" == "true" ]] && command -v sudo >/dev/null; then
+      if [[ "${USE_SUDO}" == "true" ]] && command -v sudo >/dev/null; then
         SUDO=sudo
+      fi
+
+      # If KO_VERSION_FILE is set and KO_VERSION is default, read version from file
+      KO_VERSION_TO_INSTALL=${KO_VERSION}
+      if [[ -n "${KO_VERSION_FILE}" && "${KO_VERSION}" == "latest-release" ]]; then
+        if [[ ! -f "${KO_VERSION_FILE}" ]]; then
+          echo "KO_VERSION_FILE ${KO_VERSION_FILE} does not exist"
+          exit 1
+        fi
+        KO_VERSION_TO_INSTALL=$(cat "${KO_VERSION_FILE}" | tr -d '[:space:]')
       fi
 
       # Install ko:
       # - if version is "tip", install from tip of main.
       # - if version is "latest-release", look up latest release.
       # - otherwise, install the specified version.
-      case ${{ inputs.version }} in
+      case ${KO_VERSION_TO_INSTALL} in
       tip)
         echo "Installing ko using go install"
         go install github.com/google/ko@main
@@ -37,7 +55,7 @@ runs:
         tag=$(curl -L -s -u "username:${{ github.token }}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
         ;;
       *)
-        tag="${{ inputs.version }}"
+        tag="${KO_VERSION_TO_INSTALL}"
       esac
 
       os=${{ runner.os }}

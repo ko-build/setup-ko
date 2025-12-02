@@ -59,3 +59,34 @@ jobs:
             echo "${KO_DOCKER_REPO} != already-set"
             exit 1
           fi
+
+      - name: Install ko-version-file
+        run: echo "v0.6.0" > .ko-version
+
+      - name: Install ko-version-file
+        uses: ./
+        with:
+          ko-version-file: .ko-version
+
+      - name: Check installed version
+        run: ko version | grep 0.6.0
+
+      - name: Install version if ko-version-file is set but version is explicit
+        uses: ./
+        with:
+          ko-version-file: .ko-version
+          version: v0.8.0
+
+      - name: Check installed version
+        run: ko version | grep 0.8.0
+
+      - name: Fail if ko-version-file is set but it's not a valid file
+        continue-on-error: true
+        id: validation
+        uses: ./
+        with:
+          ko-version-file: .unknown-file
+
+      - name: Verify step failed if ko-version-file is set but it's not a valid file
+        if: steps.validation.outcome != 'failure'
+        run: exit 1
