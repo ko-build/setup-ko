@@ -5,7 +5,7 @@ branding:
   color: green
 inputs:
   version:
-    description: 'Version of ko to install (tip, latest-release, v0.14.1, etc.)'
+    description: 'Version of ko to install (tip, latest-release, v0.18.1, etc.)'
     required: true
     default: 'latest-release'
   use-sudo:
@@ -16,11 +16,15 @@ runs:
   using: "composite"
   steps:
   - shell: bash
+    env:
+      KO_VERSION: ${{ inputs.version }}
+      USE_SUDO: ${{ inputs.use-sudo }}
+      GH_TOKEN: ${{ github.token }}
     run: |
       set -ex
 
       SUDO=
-      if [[ "${{ inputs.use-sudo }}" == "true" ]] && command -v sudo >/dev/null; then
+      if [[ "${USE_SUDO}" == "true" ]] && command -v sudo >/dev/null; then
         SUDO=sudo
       fi
 
@@ -28,16 +32,16 @@ runs:
       # - if version is "tip", install from tip of main.
       # - if version is "latest-release", look up latest release.
       # - otherwise, install the specified version.
-      case ${{ inputs.version }} in
+      case ${KO_VERSION} in
       tip)
         echo "Installing ko using go install"
         go install github.com/google/ko@main
         ;;
       latest-release)
-        tag=$(curl -L -s -u "username:${{ github.token }}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
+        tag=$(curl -L -s -u "username:${GH_TOKEN}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
         ;;
       *)
-        tag="${{ inputs.version }}"
+        tag="${KO_VERSION}"
       esac
 
       os=${{ runner.os }}
@@ -59,7 +63,7 @@ runs:
         echo "KO_DOCKER_REPO=${KO_DOCKER_REPO}" >> $GITHUB_ENV
       else
         # NB: username doesn't seem to matter.
-        echo "${{ github.token }}" | ko login ghcr.io --username "dummy" --password-stdin
+        echo "${GH_TOKEN}" | ko login ghcr.io --username "dummy" --password-stdin
 
         # Set KO_DOCKER_REPO for future steps.
         # We need to get the repository name in lowercase, otherwise it could fail
