@@ -8,66 +8,10 @@ inputs:
     description: 'Version of ko to install (tip, latest-release, v0.18.1, etc.)'
     required: true
     default: 'latest-release'
-  use-sudo:
-    description: 'set to true if install-dir location requires sudo privs'
+  token:
+    description: 'The token used to authenticate requests to GitHub.'
     required: false
-    default: 'false'
+    default: ${{ github.token }}
 runs:
-  using: "composite"
-  steps:
-  - shell: bash
-    env:
-      KO_VERSION: ${{ inputs.version }}
-      USE_SUDO: ${{ inputs.use-sudo }}
-      GH_TOKEN: ${{ github.token }}
-    run: |
-      set -ex
-
-      SUDO=
-      if [[ "${USE_SUDO}" == "true" ]] && command -v sudo >/dev/null; then
-        SUDO=sudo
-      fi
-
-      # Install ko:
-      # - if version is "tip", install from tip of main.
-      # - if version is "latest-release", look up latest release.
-      # - otherwise, install the specified version.
-      case ${KO_VERSION} in
-      tip)
-        echo "Installing ko using go install"
-        go install github.com/google/ko@main
-        ;;
-      latest-release)
-        tag=$(curl -L -s -u "username:${GH_TOKEN}" https://api.github.com/repos/ko-build/ko/releases/latest | jq -r '.tag_name')
-        ;;
-      *)
-        tag="${KO_VERSION}"
-      esac
-
-      os=${{ runner.os }}
-      arch=$(echo "${{ runner.arch }}" | tr '[:upper:]' '[:lower:]')
-      if [[ $os == "macOS" ]]; then
-        os="Darwin"
-      fi
-      if [[ $arch == "x64" ]]; then
-        arch="x86_64"
-      fi
-      if [[ ! -z ${tag} ]]; then
-        echo "Installing ko @ ${tag} for ${os} ${arch}"
-        curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz | $SUDO tar xzf - -C /usr/local/bin ko
-      fi
-
-      if [[ ! -z ${KO_DOCKER_REPO} ]]; then
-        echo "KO_DOCKER_REPO is already set"
-        echo "Skipping login to ghcr.io and passing KO_DOCKER_REPO=${KO_DOCKER_REPO} on to future steps"
-        echo "KO_DOCKER_REPO=${KO_DOCKER_REPO}" >> $GITHUB_ENV
-      else
-        # NB: username doesn't seem to matter.
-        echo "${GH_TOKEN}" | ko login ghcr.io --username "dummy" --password-stdin
-
-        # Set KO_DOCKER_REPO for future steps.
-        # We need to get the repository name in lowercase, otherwise it could fail
-        repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        echo "KO_DOCKER_REPO=ghcr.io/${repo}"
-        echo "KO_DOCKER_REPO=ghcr.io/${repo}" >> $GITHUB_ENV
-      fi
+  using: 'node24'
+  main: 'dist/setup/index.js'

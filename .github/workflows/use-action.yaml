@@ -45,9 +45,7 @@ jobs:
           version: tip
 
       - name: Check installed version (tip)
-        run: |
-          sudo rm /usr/local/bin/ko # Uninstall previous versions.
-          ko version
+        run: ko version
 
       # If KO_DOCKER_REPO is set during setup, it's set for future steps.
       - name: Pre-set KO_DOCKER_REPO

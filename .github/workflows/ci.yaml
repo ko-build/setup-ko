@@ -8,7 +8,42 @@ on:
 permissions: {}
 
 jobs:
+  build:
+    permissions:
+      contents: read
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@d41d4278a1c93e6b2d6962d5448c0169f6f66cd3 # v4.1.0
+        with:
+          version: 11.5.2
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v6.0.0
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run format-check
+
+      - run: pnpm run lint
+
+      - run: pnpm test
+
+      - run: pnpm run build
+
+      - name: Check generated dist
+        run: git diff --exit-code -- dist
+
   test-ko-action:
+    needs: build
+
     strategy:
       matrix:
         runner:
@@ -52,9 +87,7 @@ jobs:
           version: tip
 
       - name: Check installed version (tip)
-        run: |
-          sudo rm /usr/local/bin/ko # Uninstall previous versions.
-          ko version
+        run: ko version
 
       # If KO_DOCKER_REPO is set during setup, it's set for future steps.
       - name: Pre-set KO_DOCKER_REPO
