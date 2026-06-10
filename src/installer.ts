@@ -86,12 +86,12 @@ export async function getLatestReleaseTag(token: string): Promise<string> {
 
 export async function downloadAndCacheKo(
   tag: string,
-  cacheVersion: string,
-  cacheArch: string
+  version: string,
+  arch: string
 ): Promise<string> {
   const platform = getKoPlatform();
-  const assetArch = getKoAssetArch(cacheArch);
-  const downloadUrl = getKoDownloadUrl(tag, cacheVersion, platform, assetArch);
+  const assetArch = getKoAssetArch(arch);
+  const downloadUrl = getKoDownloadUrl(tag, version, platform, assetArch);
 
   core.info(`Downloading ko ${tag} for ${platform} ${assetArch}`);
   const archivePath = await tc.downloadTool(downloadUrl);
@@ -105,7 +105,7 @@ export async function downloadAndCacheKo(
   }
 
   core.info('Adding ko to the hosted tool cache');
-  return tc.cacheDir(extractedPath, 'ko', cacheVersion, cacheArch);
+  return tc.cacheDir(extractedPath, 'ko', version, arch);
 }
 
 export function getKoDownloadUrl(
