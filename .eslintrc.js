@@ -1,50 +1,76 @@
-// This is a reusable configuration file copied from https://github.com/actions/reusable-workflows/tree/main/reusable-configurations.
-module.exports = {
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:eslint-plugin-jest/recommended',
-    'eslint-config-prettier'
-  ],
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'eslint-plugin-node', 'eslint-plugin-jest'],
-  rules: {
-    '@typescript-eslint/no-require-imports': 'error',
-    '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/ban-ts-comment': [
-      'error',
-      {
-        'ts-ignore': 'allow-with-description'
-      }
-    ],
-    'no-console': 'error',
-    yoda: 'error',
-    'prefer-const': [
-      'error',
-      {
-        destructuring: 'all'
-      }
-    ],
-    'no-control-regex': 'off',
-    'no-constant-condition': ['error', {checkLoops: false}],
-    'node/no-extraneous-import': 'error'
+// This is based on the reusable configuration from
+// https://github.com/actions/reusable-workflows/tree/main/reusable-configurations.
+const js = require('@eslint/js');
+const tsParser = require('@typescript-eslint/parser');
+const tsPlugin = require('@typescript-eslint/eslint-plugin');
+const nodePlugin = require('eslint-plugin-n').default;
+const jestPlugin = require('eslint-plugin-jest');
+const prettierConfig = require('eslint-config-prettier');
+
+module.exports = [
+  {
+    ignores: ['coverage/**', 'dist/**', 'lib/**', 'node_modules/**']
   },
-  overrides: [
-    {
-      files: ['**/*{test,spec}.ts'],
-      rules: {
-        '@typescript-eslint/no-unused-vars': 'off',
-        'jest/no-standalone-expect': 'off',
-        'jest/no-conditional-expect': 'off',
-        'no-console': 'off'
+  js.configs.recommended,
+  {
+    files: ['**/*.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        sourceType: 'module'
+      },
+      globals: {
+        Buffer: 'readonly',
+        NodeJS: 'readonly',
+        process: 'readonly'
       }
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      n: nodePlugin,
+      jest: jestPlugin
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+      '@typescript-eslint/no-require-imports': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/ban-ts-comment': [
+        'error',
+        {
+          'ts-ignore': 'allow-with-description'
+        }
+      ],
+      'no-console': 'error',
+      yoda: 'error',
+      'prefer-const': [
+        'error',
+        {
+          destructuring: 'all'
+        }
+      ],
+      'no-control-regex': 'off',
+      'no-constant-condition': ['error', {checkLoops: false}],
+      'n/no-extraneous-import': 'error'
     }
-  ],
-  env: {
-    node: true,
-    es6: true,
-    'jest/globals': true
-  }
-};
+  },
+  {
+    files: ['**/*{test,spec}.ts'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        expect: 'readonly',
+        it: 'readonly'
+      }
+    },
+    rules: {
+      ...jestPlugin.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': 'off',
+      'jest/no-standalone-expect': 'off',
+      'jest/no-conditional-expect': 'off',
+      'no-console': 'off'
+    }
+  },
+  prettierConfig
+];

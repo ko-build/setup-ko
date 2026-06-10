@@ -5,7 +5,7 @@ import {
   getKoPlatform,
   normalizeKoReleaseTag,
   tagToCacheVersion
-} from './installer';
+} from './ko';
 
 describe('installer helpers', () => {
   it('maps runner platforms to ko release platforms', () => {

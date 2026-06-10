@@ -5,7 +5,15 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   testRunner: 'jest-circus/runner',
   transform: {
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.ts$': [
+      'babel-jest',
+      {
+        presets: [
+          ['@babel/preset-env', {targets: {node: 'current'}}],
+          '@babel/preset-typescript'
+        ]
+      }
+    ]
   },
   verbose: true
 };
