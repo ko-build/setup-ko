@@ -62,8 +62,12 @@ export async function installKo(
 export async function installTip(): Promise<void> {
   core.info('Installing ko from the tip of main using go install');
   await exec.exec('go', ['install', `${KO_MODULE}@main`]);
-  const goPath = await getGoPath();
-  const goBin = path.join(goPath, 'bin');
+  const goBinOutput = await exec.getExecOutput('go', ['env', 'GOBIN'], {
+    silent: true,
+    ignoreReturnCode: false
+  });
+  const goBin =
+    goBinOutput.stdout.trim() || path.join(await getGoPath(), 'bin');
   core.addPath(goBin);
   core.info(`Added ${goBin} to PATH`);
 }
@@ -131,7 +135,9 @@ export async function configureDockerRepo(token: string): Promise<void> {
 
 export async function loginToGhcr(token: string): Promise<void> {
   if (!token) {
-    throw new Error('A GitHub token is required to log in to ghcr.io');
+    throw new Error(
+      "A GitHub token is required to log in to ghcr.io. Provide the 'token' input, or set KO_DOCKER_REPO to skip registry login."
+    );
   }
 
   await exec.exec(
