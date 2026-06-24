@@ -2,22 +2,33 @@
 version: 2
 updates:
   - package-ecosystem: gomod
-    directory: "/"
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     open-pull-requests-limit: 10
     groups:
       all:
         update-types:
-          - "patch"
+          - 'patch'
 
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: npm
+    directory: '/'
     schedule:
-      interval: "daily"
+      interval: 'daily'
     open-pull-requests-limit: 10
     groups:
       all:
         update-types:
-          - "minor"
-          - "patch"
+          - 'minor'
+          - 'patch'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 10
+    groups:
+      all:
+        update-types:
+          - 'minor'
+          - 'patch'

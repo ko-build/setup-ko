@@ -1,0 +1,150 @@
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import * as core from '@actions/core';
+import * as exec from '@actions/exec';
+import * as github from '@actions/github';
+import * as tc from '@actions/tool-cache';
+import {
+  getExecutableName,
+  getKoAssetArch,
+  getKoDownloadUrl,
+  getKoPlatform,
+  normalizeKoReleaseTag,
+  tagToCacheVersion
+} from './ko';
+
+const KO_REPO_OWNER = 'ko-build';
+const KO_REPO_NAME = 'ko';
+const KO_MODULE = 'github.com/google/ko';
+
+export async function run(): Promise<void> {
+  const token = core.getInput('token');
+  const versionInput = core.getInput('version', {required: true});
+
+  if (token) {
+    core.setSecret(token);
+  }
+
+  await installKo(versionInput, token);
+  await configureDockerRepo(token);
+}
+
+export async function installKo(
+  versionInput: string,
+  token: string
+): Promise<void> {
+  const version = versionInput.trim();
+
+  if (version === 'tip') {
+    await installTip();
+    return;
+  }
+
+  const tag =
+    version === 'latest-release'
+      ? await getLatestReleaseTag(token)
+      : normalizeKoReleaseTag(version);
+  const cacheVersion = tagToCacheVersion(tag);
+  const cacheArch = os.arch();
+
+  let toolPath = tc.find('ko', cacheVersion, cacheArch);
+  if (toolPath) {
+    core.info(`Found ko ${tag} in cache @ ${toolPath}`);
+  } else {
+    toolPath = await downloadAndCacheKo(tag, cacheVersion, cacheArch);
+  }
+
+  core.addPath(toolPath);
+  core.info(`Added ko ${tag} to PATH`);
+}
+
+export async function installTip(): Promise<void> {
+  core.info('Installing ko from the tip of main using go install');
+  await exec.exec('go', ['install', `${KO_MODULE}@main`]);
+  const goBinOutput = await exec.getExecOutput('go', ['env', 'GOBIN'], {
+    silent: true,
+    ignoreReturnCode: false
+  });
+  const goBin =
+    goBinOutput.stdout.trim() || path.join(await getGoPath(), 'bin');
+  core.addPath(goBin);
+  core.info(`Added ${goBin} to PATH`);
+}
+
+export async function getGoPath(): Promise<string> {
+  const output = await exec.getExecOutput('go', ['env', 'GOPATH'], {
+    silent: true,
+    ignoreReturnCode: false
+  });
+
+  return output.stdout.trim();
+}
+
+export async function getLatestReleaseTag(token: string): Promise<string> {
+  core.info('Resolving latest ko release');
+
+  const octokit = github.getOctokit(token, {userAgent: 'setup-ko'});
+  const response = await octokit.rest.repos.getLatestRelease({
+    owner: KO_REPO_OWNER,
+    repo: KO_REPO_NAME
+  });
+
+  return response.data.tag_name;
+}
+
+export async function downloadAndCacheKo(
+  tag: string,
+  version: string,
+  arch: string
+): Promise<string> {
+  const platform = getKoPlatform();
+  const assetArch = getKoAssetArch(arch);
+  const downloadUrl = getKoDownloadUrl(tag, version, platform, assetArch);
+
+  core.info(`Downloading ko ${tag} for ${platform} ${assetArch}`);
+  const archivePath = await tc.downloadTool(downloadUrl);
+  const extractedPath = await tc.extractTar(archivePath);
+  const executablePath = path.join(extractedPath, getExecutableName());
+
+  if (!fs.existsSync(executablePath)) {
+    throw new Error(
+      `ko executable was not found in the extracted archive at ${executablePath}`
+    );
+  }
+
+  core.info('Adding ko to the hosted tool cache');
+  return tc.cacheDir(extractedPath, 'ko', version, arch);
+}
+
+export async function configureDockerRepo(token: string): Promise<void> {
+  const existingRepo = process.env.KO_DOCKER_REPO;
+  if (existingRepo) {
+    core.info('KO_DOCKER_REPO is already set');
+    core.exportVariable('KO_DOCKER_REPO', existingRepo);
+    return;
+  }
+
+  await loginToGhcr(token);
+
+  const repo = github.context.repo;
+  const dockerRepo = `ghcr.io/${repo.owner}/${repo.repo}`.toLowerCase();
+  core.info(`KO_DOCKER_REPO=${dockerRepo}`);
+  core.exportVariable('KO_DOCKER_REPO', dockerRepo);
+}
+
+export async function loginToGhcr(token: string): Promise<void> {
+  if (!token) {
+    throw new Error(
+      "A GitHub token is required to log in to ghcr.io. Provide the 'token' input, or set KO_DOCKER_REPO to skip registry login."
+    );
+  }
+
+  await exec.exec(
+    'ko',
+    ['login', 'ghcr.io', '--username', 'dummy', '--password-stdin'],
+    {
+      input: Buffer.from(token)
+    }
+  );
+}
