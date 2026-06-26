@@ -20,6 +20,9 @@ runs:
       KO_VERSION: ${{ inputs.version }}
       USE_SUDO: ${{ inputs.use-sudo }}
       GH_TOKEN: ${{ github.token }}
+      RUNNER_OS: ${{ runner.os }}
+      RUNNER_ARCH: ${{ runner.arch }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
     run: |
       set -ex
 
@@ -44,8 +47,8 @@ runs:
         tag="${KO_VERSION}"
       esac
 
-      os=${{ runner.os }}
-      arch=$(echo "${{ runner.arch }}" | tr '[:upper:]' '[:lower:]')
+      os="${RUNNER_OS}"
+      arch=$(echo "${RUNNER_ARCH}" | tr '[:upper:]' '[:lower:]')
       if [[ $os == "macOS" ]]; then
         os="Darwin"
       fi
@@ -54,7 +57,7 @@ runs:
       fi
       if [[ ! -z ${tag} ]]; then
         echo "Installing ko @ ${tag} for ${os} ${arch}"
-        curl -fsL https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz | $SUDO tar xzf - -C /usr/local/bin ko
+        curl -fsL "https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz" | $SUDO tar xzf - -C /usr/local/bin ko
       fi
 
       if [[ ! -z ${KO_DOCKER_REPO} ]]; then
@@ -67,7 +70,8 @@ runs:
 
         # Set KO_DOCKER_REPO for future steps.
         # We need to get the repository name in lowercase, otherwise it could fail
-        repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        echo "KO_DOCKER_REPO=ghcr.io/${repo}"
-        echo "KO_DOCKER_REPO=ghcr.io/${repo}" >> $GITHUB_ENV
+        repo=$(printf '%s' "${GITHUB_REPOSITORY}" | tr -d '\n\r' | tr '[:upper:]' '[:lower:]')
+        ko_docker_repo=$(printf 'ghcr.io/%s' "${repo}")
+        echo "KO_DOCKER_REPO=${ko_docker_repo}"
+        echo "KO_DOCKER_REPO=${ko_docker_repo}" >> "${GITHUB_ENV}"
       fi
