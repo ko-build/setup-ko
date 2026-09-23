@@ -57,7 +57,22 @@ runs:
       fi
       if [[ ! -z ${tag} ]]; then
         echo "Installing ko @ ${tag} for ${os} ${arch}"
-        curl -fsL "https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz" | $SUDO tar xzf - -C /usr/local/bin ko
+        archive=$(mktemp)
+        trap 'rm -f "$archive"' EXIT
+        url="https://github.com/ko-build/ko/releases/download/${tag}/ko_${tag:1}_${os}_${arch}.tar.gz"
+        for attempt in 1 2 3 4 5; do
+          # Validate the whole archive before extracting it. A successful
+          # download can still contain a truncated tarball.
+          if curl -fsL "$url" -o "$archive" && tar tzf "$archive" ko >/dev/null; then
+            $SUDO tar xzf "$archive" -C /usr/local/bin ko
+            break
+          fi
+          if [[ "$attempt" -eq 5 ]]; then
+            echo "Failed to download ko after $attempt attempts" >&2
+            exit 1
+          fi
+          sleep "$((5 * attempt))"
+        done
       fi
 
       if [[ ! -z ${KO_DOCKER_REPO} ]]; then
